@@ -8,25 +8,25 @@
     html, body {
       margin: 0;
       padding: 0;
-      height: 100%;
       overflow: hidden;
-      font-family: 'Courier New', monospace;
       background-color: #000;
       color: #00ff00;
-      text-align: center;
+      font-family: 'Courier New', monospace;
+      height: 100%;
     }
 
-    canvas {
+    canvas#matrix {
       position: fixed;
       top: 0;
       left: 0;
       z-index: -1;
     }
 
-    #content {
+    .container {
       position: relative;
-      z-index: 1;
+      text-align: center;
       padding-top: 50px;
+      z-index: 1;
     }
 
     #timeInput {
@@ -70,151 +70,145 @@
   </style>
 </head>
 <body>
-  <canvas id="matrixCanvas"></canvas>
 
-  <div id="content">
-    <h1>⏱ Countdown Timer</h1>
-    <input type="text" id="timeInput" value="00:00:10" maxlength="8" />
+<canvas id="matrix"></canvas>
 
-    <svg width="200" height="200">
-      <circle class="circle-bg" cx="100" cy="100" r="90" stroke-width="10" fill="none" />
-      <circle class="circle-progress" cx="100" cy="100" r="90" stroke-width="10" fill="none"
-        stroke-dasharray="565.48" stroke-dashoffset="0" />
-    </svg>
+<div class="container">
+  <h1>⏱ Hacker Countdown Timer</h1>
+  <input type="text" id="timeInput" value="00:01:00" maxlength="8" />
 
-    <div id="controls">
-      <button id="startBtn">Start</button>
-      <button id="pauseBtn">Pause</button>
-      <button id="resetBtn">Reset</button>
-    </div>
+  <svg width="200" height="200">
+    <circle class="circle-bg" cx="100" cy="100" r="90" stroke-width="10" fill="none" />
+    <circle class="circle-progress" cx="100" cy="100" r="90" stroke-width="10" fill="none"
+      stroke-dasharray="565.48" stroke-dashoffset="0" />
+  </svg>
+
+  <div id="controls">
+    <button id="startBtn">Start</button>
+    <button id="pauseBtn">Pause</button>
+    <button id="resetBtn">Reset</button>
   </div>
+</div>
 
-  <audio id="beep" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto"></audio>
+<!-- Sound -->
+<audio id="beep" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto"></audio>
 
-  <script>
-    // === Matrix Rain Animation ===
-    const canvas = document.getElementById('matrixCanvas');
-    const ctx = canvas.getContext('2d');
-    const fontSize = 16;
-    let columns, drops;
+<script>
+  // Matrix Rain Background
+  const canvas = document.getElementById('matrix');
+  const ctx = canvas.getContext('2d');
 
-    function initMatrix() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      columns = Math.floor(canvas.width / fontSize);
-      drops = Array.from({ length: columns }).fill(1);
-    }
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 
-    function drawMatrix() {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+  const letters = 'アァイィウエエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789'.split('');
+  const fontSize = 16;
+  const columns = canvas.width / fontSize;
+  const drops = Array.from({ length: columns }).fill(1);
 
-      ctx.fillStyle = "#0F0";
-      ctx.font = fontSize + "px monospace";
+  function drawMatrix() {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      for (let i = 0; i < drops.length; i++) {
-        const char = Math.random() > 0.5 ? "1" : "0";
-        ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+    ctx.fillStyle = '#00ff00';
+    ctx.font = fontSize + 'px monospace';
 
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-          drops[i] = 0;
-        }
-        drops[i]++;
-      }
-    }
+    for (let i = 0; i < drops.length; i++) {
+      const text = letters[Math.floor(Math.random() * letters.length)];
+      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
 
-    window.addEventListener('resize', () => {
-      initMatrix();
-    });
-
-    initMatrix();
-    setInterval(drawMatrix, 33);
-
-    // === Timer Logic ===
-    const input = document.getElementById('timeInput');
-    const startBtn = document.getElementById('startBtn');
-    const pauseBtn = document.getElementById('pauseBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const progressCircle = document.querySelector('.circle-progress');
-    const beep = document.getElementById('beep');
-
-    const RADIUS = 90;
-    const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
-
-    let totalSeconds = 0;
-    let remainingSeconds = 0;
-    let timer;
-    let running = false;
-
-    function timeToSeconds(timeStr) {
-      const parts = timeStr.split(':').map(Number);
-      const [h, m, s] = [parts[0] || 0, parts[1] || 0, parts[2] || 0];
-      return h * 3600 + m * 60 + s;
-    }
-
-    function secondsToTime(sec) {
-      const h = String(Math.floor(sec / 3600)).padStart(2, '0');
-      const m = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
-      const s = String(sec % 60).padStart(2, '0');
-      return `${h}:${m}:${s}`;
-    }
-
-    function updateProgress() {
-      const offset = totalSeconds > 0 ? CIRCUMFERENCE * (1 - remainingSeconds / totalSeconds) : 0;
-      progressCircle.style.strokeDashoffset = offset;
-    }
-
-    function startTimer() {
-      if (running) return;
-      if (remainingSeconds <= 0) {
-        totalSeconds = timeToSeconds(input.value);
-        if (totalSeconds <= 0) return;
-        remainingSeconds = totalSeconds;
+      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+        drops[i] = 0;
       }
 
-      running = true;
-      timer = setInterval(() => {
-        if (remainingSeconds > 0) {
-          remainingSeconds--;
-          input.value = secondsToTime(remainingSeconds);
-          updateProgress();
-        } else {
-          clearInterval(timer);
-          running = false;
-          beep.play();
-        }
-      }, 1000);
+      drops[i]++;
     }
 
-    function pauseTimer() {
-      clearInterval(timer);
-      running = false;
-    }
+    requestAnimationFrame(drawMatrix);
+  }
 
-    function resetTimer() {
-      clearInterval(timer);
-      running = false;
+  drawMatrix();
+
+  // Timer Logic
+  const input = document.getElementById('timeInput');
+  const startBtn = document.getElementById('startBtn');
+  const pauseBtn = document.getElementById('pauseBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const progressCircle = document.querySelector('.circle-progress');
+  const beep = document.getElementById('beep');
+
+  const RADIUS = 90;
+  const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+
+  let totalSeconds = 0;
+  let remainingSeconds = 0;
+  let timer;
+  let running = false;
+
+  function timeToSeconds(timeStr) {
+    const parts = timeStr.split(':').map(Number);
+    const [h, m, s] = [parts[0] || 0, parts[1] || 0, parts[2] || 0];
+    return h * 3600 + m * 60 + s;
+  }
+
+  function secondsToTime(sec) {
+    const h = String(Math.floor(sec / 3600)).padStart(2, '0');
+    const m = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
+    const s = String(sec % 60).padStart(2, '0');
+    return `${h}:${m}:${s}`;
+  }
+
+  function updateProgress() {
+    const offset = CIRCUMFERENCE * (1 - remainingSeconds / totalSeconds);
+    progressCircle.style.strokeDashoffset = offset;
+  }
+
+  function startTimer() {
+    if (running) return;
+    if (remainingSeconds <= 0) {
+      totalSeconds = timeToSeconds(input.value);
+      if (totalSeconds <= 0) return;
       remainingSeconds = totalSeconds;
-      input.value = secondsToTime(totalSeconds);
-      updateProgress();
     }
 
-    // Keyboard support
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        startTimer();
+    running = true;
+    timer = setInterval(() => {
+      if (remainingSeconds > 0) {
+        remainingSeconds--;
+        input.value = secondsToTime(remainingSeconds);
+        updateProgress();
+      } else {
+        clearInterval(timer);
+        running = false;
+        beep.play();
       }
-    });
+    }, 1000);
+  }
 
-    // Init progress circle
-    progressCircle.style.strokeDasharray = CIRCUMFERENCE;
-    progressCircle.style.strokeDashoffset = 0;
+  function pauseTimer() {
+    clearInterval(timer);
+    running = false;
+  }
 
-    // Button listeners
-    startBtn.addEventListener('click', startTimer);
-    pauseBtn.addEventListener('click', pauseTimer);
-    resetBtn.addEventListener('click', resetTimer);
-  </script>
+  function resetTimer() {
+    clearInterval(timer);
+    running = false;
+    input.value = secondsToTime(totalSeconds);
+    remainingSeconds = totalSeconds;
+    updateProgress();
+  }
+
+  progressCircle.style.strokeDasharray = CIRCUMFERENCE;
+  progressCircle.style.strokeDashoffset = 0;
+
+  startBtn.addEventListener('click', startTimer);
+  pauseBtn.addEventListener('click', pauseTimer);
+  resetBtn.addEventListener('click', resetTimer);
+
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+</script>
 </body>
 </html>
