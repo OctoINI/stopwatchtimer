@@ -117,30 +117,26 @@
     drops = Array(columns).fill(1);
   }
 
-  function drawMatrix() {
-    ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-    ctx.fillRect(0, 0, width, height);
+function drawMatrix() {
+  ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+  ctx.fillRect(0, 0, width, height);
 
-    ctx.fillStyle = "#00ff00";
-    ctx.font = fontSize + "px monospace";
+  ctx.fillStyle = "#00ff00";
+  ctx.font = fontSize + "px monospace";
 
-    const shouldMove = frame % 2 === 0; // Slow down here
+  for (let i = 0; i < drops.length; i++) {
+    const text = letters[Math.floor(Math.random() * letters.length)];
+    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
 
-    for (let i = 0; i < drops.length; i++) {
-      const text = letters[Math.floor(Math.random() * letters.length)];
-      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-      if (shouldMove) {
-        if (drops[i] * fontSize > height && Math.random() > 0.975) {
-          drops[i] = 0;
-        }
-        drops[i]++;
-      }
+    if (drops[i] * fontSize > height && Math.random() > 0.975) {
+      drops[i] = 0;
     }
-
-    frame++;
-    requestAnimationFrame(drawMatrix);
+    drops[i]++;
   }
+
+  // Slow it down by 50ms per frame (adjust this to make it slower/faster)
+  setTimeout(() => requestAnimationFrame(drawMatrix), 50);
+}
 
   initMatrix();
   drawMatrix();
