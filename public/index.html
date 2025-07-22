@@ -15,14 +15,13 @@
       height: 100%;
     }
 
-    /* matrix canvas sits behind countdown but above the black background */
     canvas#matrix {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      z-index: 0;       /* changed from -1 */
+      z-index: 0;
     }
 
     .container {
@@ -96,12 +95,13 @@
 <audio id="beep" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto"></audio>
 
 <script>
-  // Matrix Rain Effect with Retina support
+  // Matrix Rain Effect with slower speed
   const canvas = document.getElementById("matrix");
   const ctx = canvas.getContext("2d");
 
   let width, height, columns, drops;
   const fontSize = 12;
+  let frame = 0;
   const letters = 'アァイィウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789'.split('');
 
   function initMatrix() {
@@ -109,11 +109,8 @@
     width = window.innerWidth;
     height = window.innerHeight;
 
-    // resize canvas to physical pixels
     canvas.width = width * dpr;
     canvas.height = height * dpr;
-
-    // reset any transforms then scale to DPR
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     columns = Math.floor(width / fontSize);
@@ -121,23 +118,27 @@
   }
 
   function drawMatrix() {
-    // translucent black fill for the fading trail
     ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
     ctx.fillRect(0, 0, width, height);
 
     ctx.fillStyle = "#00ff00";
     ctx.font = fontSize + "px monospace";
 
+    const shouldMove = frame % 2 === 0; // Slow down here
+
     for (let i = 0; i < drops.length; i++) {
       const text = letters[Math.floor(Math.random() * letters.length)];
       ctx.fillText(text, i * fontSize, drops[i] * fontSize);
 
-      if (drops[i] * fontSize > height && Math.random() > 0.975) {
-        drops[i] = 0;
+      if (shouldMove) {
+        if (drops[i] * fontSize > height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
       }
-      drops[i]++;
     }
 
+    frame++;
     requestAnimationFrame(drawMatrix);
   }
 
