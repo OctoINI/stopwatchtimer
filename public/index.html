@@ -74,7 +74,7 @@
 
   <div id="content">
     <h1>⏱ Countdown Timer</h1>
-    <input type="text" id="timeInput" value="00:00:00" maxlength="8" />
+    <input type="text" id="timeInput" value="00:00:10" maxlength="8" />
 
     <svg width="200" height="200">
       <circle class="circle-bg" cx="100" cy="100" r="90" stroke-width="10" fill="none" />
@@ -92,22 +92,18 @@
   <audio id="beep" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto"></audio>
 
   <script>
-    // MATRIX RAIN
+    // === Matrix Rain Animation ===
     const canvas = document.getElementById('matrixCanvas');
     const ctx = canvas.getContext('2d');
-
+    const fontSize = 16;
     let columns, drops;
-    const chars = "01";
-    const fontSize = 14;
 
-    function resizeCanvas() {
+    function initMatrix() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       columns = Math.floor(canvas.width / fontSize);
-      drops = Array(columns).fill(1);
+      drops = Array.from({ length: columns }).fill(1);
     }
-
-    window.addEventListener('resize', resizeCanvas);
 
     function drawMatrix() {
       ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
@@ -117,23 +113,24 @@
       ctx.font = fontSize + "px monospace";
 
       for (let i = 0; i < drops.length; i++) {
-        const text = chars[Math.floor(Math.random() * chars.length)];
-        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+        const char = Math.random() > 0.5 ? "1" : "0";
+        ctx.fillText(char, i * fontSize, drops[i] * fontSize);
 
         if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
           drops[i] = 0;
         }
-
         drops[i]++;
       }
     }
 
-    window.onload = () => {
-      resizeCanvas();
-      setInterval(drawMatrix, 33);
-    };
+    window.addEventListener('resize', () => {
+      initMatrix();
+    });
 
-    // TIMER LOGIC
+    initMatrix();
+    setInterval(drawMatrix, 33);
+
+    // === Timer Logic ===
     const input = document.getElementById('timeInput');
     const startBtn = document.getElementById('startBtn');
     const pauseBtn = document.getElementById('pauseBtn');
@@ -202,6 +199,7 @@
       updateProgress();
     }
 
+    // Keyboard support
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -209,14 +207,14 @@
       }
     });
 
+    // Init progress circle
     progressCircle.style.strokeDasharray = CIRCUMFERENCE;
     progressCircle.style.strokeDashoffset = 0;
 
+    // Button listeners
     startBtn.addEventListener('click', startTimer);
     pauseBtn.addEventListener('click', pauseTimer);
     resetBtn.addEventListener('click', resetTimer);
   </script>
 </body>
 </html>
-
-
