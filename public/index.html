@@ -3,13 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Hacker Countdown Timer</title>
+  <title>Countdown Timer</title>
   <style>
-    body {
-      background-color: #000;
-      color: #00ff00;
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
       font-family: 'Courier New', monospace;
+      color: #00ff00;
       text-align: center;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    #content {
+      position: relative;
+      z-index: 1;
       padding-top: 50px;
     }
 
@@ -54,26 +69,60 @@
   </style>
 </head>
 <body>
+  <canvas id="matrixCanvas"></canvas>
 
-  <h1>⏱ Hacker Countdown Timer</h1>
-  <input type="text" id="timeInput" value="00:01:00" maxlength="8" />
+  <div id="content">
+    <h1>⏱ Hacker Countdown Timer</h1>
+    <input type="text" id="timeInput" value="00:00:00" maxlength="8" />
 
-  <svg width="200" height="200">
-    <circle class="circle-bg" cx="100" cy="100" r="90" stroke-width="10" fill="none" />
-    <circle class="circle-progress" cx="100" cy="100" r="90" stroke-width="10" fill="none"
-      stroke-dasharray="565.48" stroke-dashoffset="0" />
-  </svg>
+    <svg width="200" height="200">
+      <circle class="circle-bg" cx="100" cy="100" r="90" stroke-width="10" fill="none" />
+      <circle class="circle-progress" cx="100" cy="100" r="90" stroke-width="10" fill="none"
+        stroke-dasharray="565.48" stroke-dashoffset="0" />
+    </svg>
 
-  <div id="controls">
-    <button id="startBtn">Start</button>
-    <button id="pauseBtn">Pause</button>
-    <button id="resetBtn">Reset</button>
+    <div id="controls">
+      <button id="startBtn">Start</button>
+      <button id="pauseBtn">Pause</button>
+      <button id="resetBtn">Reset</button>
+    </div>
   </div>
 
-  <!-- Sound -->
   <audio id="beep" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto"></audio>
 
   <script>
+    // Matrix Rain Canvas Animation
+    const canvas = document.getElementById('matrixCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+
+    const chars = "01";
+    const fontSize = 14;
+    const columns = canvas.width / fontSize;
+    const drops = Array.from({ length: columns }).fill(1);
+
+    function drawMatrix() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#0F0";
+      ctx.font = fontSize + "px monospace";
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = chars[Math.floor(Math.random() * chars.length)];
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    }
+
+    setInterval(drawMatrix, 33);
+
+    // Timer Logic
     const input = document.getElementById('timeInput');
     const startBtn = document.getElementById('startBtn');
     const pauseBtn = document.getElementById('pauseBtn');
@@ -88,6 +137,12 @@
     let remainingSeconds = 0;
     let timer;
     let running = false;
+
+    input.addEventListener('input', () => {
+      let cleaned = input.value.replace(/[^\d]/g, '').padStart(6, '0').slice(-6);
+      let formatted = cleaned.replace(/(\d{2})(\d{2})(\d{2})/, '$1:$2:$3');
+      input.value = formatted;
+    });
 
     function timeToSeconds(timeStr) {
       const parts = timeStr.split(':').map(Number);
@@ -152,3 +207,4 @@
   </script>
 </body>
 </html>
+
