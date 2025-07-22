@@ -74,29 +74,31 @@
     }
 
     function drawMatrix() {
-      // Trail effect
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-      ctx.fillRect(0, 0, width, height);
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.fillStyle = '#00ff00';
-      ctx.font = `${fontSize}px monospace`;
+  ctx.fillStyle = '#00ff00';
+  ctx.font = fontSize + 'px monospace';
 
-      for (let i = 0; i < drops.length; i++) {
-        const char = letters[Math.floor(Math.random() * letters.length)];
-        ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+  for (let i = 0; i < drops.length; i++) {
+    const text = letters[Math.floor(Math.random() * letters.length)];
+    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
 
-        if (drops[i] * fontSize > height && Math.random() > 0.975) {
-          drops[i] = 0;
-        }
-        drops[i]++;
-      }
-
-      requestAnimationFrame(drawMatrix);
+    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+      drops[i] = 0;
     }
 
-    initMatrix();
-    drawMatrix();
-    window.addEventListener('resize', initMatrix);
+    drops[i]++;
+  }
+
+  setTimeout(() => requestAnimationFrame(drawMatrix), 40); // slow down animation
+}
+
+initMatrix();
+drawMatrix();
+window.addEventListener("resize", () => {
+  initMatrix();  // recalculates width, height, columns, and resets drops
+});
   </script>
 
 </body>
