@@ -118,24 +118,24 @@
   }
 
 function drawMatrix() {
-  ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-  ctx.fillRect(0, 0, width, height);
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  ctx.fillStyle = "#00ff00";
-  ctx.font = fontSize + "px monospace";
+  ctx.fillStyle = '#00ff00';
+  ctx.font = fontSize + 'px monospace';
 
   for (let i = 0; i < drops.length; i++) {
     const text = letters[Math.floor(Math.random() * letters.length)];
     ctx.fillText(text, i * fontSize, drops[i] * fontSize);
 
-    if (drops[i] * fontSize > height && Math.random() > 0.975) {
+    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
       drops[i] = 0;
     }
+
     drops[i]++;
   }
 
-  // Slow it down by 50ms per frame (adjust this to make it slower/faster)
-  setTimeout(() => requestAnimationFrame(drawMatrix), 50);
+  setTimeout(() => requestAnimationFrame(drawMatrix), 50); // Slowed down here
 }
 
   initMatrix();
