@@ -1,62 +1,148 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Stopwatch</title>
-<style>
-  body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-  #time { font-size: 48px; margin-bottom: 20px; }
-  button { font-size: 18px; margin: 5px; padding: 10px 20px; }
-</style>
-</head>
-<body>
-  <div id="time">00:00:00.00</div>
-  <button id="start">Start</button>
-  <button id="stop">Stop</button>
-  <button id="reset">Reset</button>
-
-  <script>
-    let startTime, updatedTime, difference, timerInterval;
-    let running = false;
-
-    function updateTime() {
-      updatedTime = new Date().getTime();
-      difference = updatedTime - startTime;
-
-      let hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      let minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-      let seconds = Math.floor((difference % (1000 * 60)) / 1000);
-      let milliseconds = Math.floor((difference % 1000) / 10);
-
-      document.getElementById('time').textContent =
-        (hours < 10 ? "0" + hours : hours) + ":" +
-        (minutes < 10 ? "0" + minutes : minutes) + ":" +
-        (seconds < 10 ? "0" + seconds : seconds) + "." +
-        (milliseconds < 10 ? "0" + milliseconds : milliseconds);
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Countdown Timer</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #00ff00;
+      font-family: 'Courier New', monospace;
+      text-align: center;
+      padding-top: 50px;
     }
 
-    document.getElementById('start').addEventListener('click', () => {
-      if (!running) {
-        startTime = new Date().getTime() - (difference || 0);
-        timerInterval = setInterval(updateTime, 10);
-        running = true;
-      }
-    });
+    #timeInput {
+      font-size: 32px;
+      background: #000;
+      border: 2px solid #00ff00;
+      color: #00ff00;
+      width: 180px;
+      text-align: center;
+    }
 
-    document.getElementById('stop').addEventListener('click', () => {
-      if (running) {
-        clearInterval(timerInterval);
-        running = false;
-      }
-    });
+    #controls button {
+      background: #000;
+      color: #00ff00;
+      border: 2px solid #00ff00;
+      font-size: 18px;
+      margin: 10px;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
 
-    document.getElementById('reset').addEventListener('click', () => {
-      clearInterval(timerInterval);
+    #controls button:hover {
+      background-color: #003300;
+    }
+
+    svg {
+      transform: rotate(-90deg);
+      margin: 40px auto;
+      display: block;
+    }
+
+    .circle-bg {
+      stroke: #333;
+    }
+
+    .circle-progress {
+      stroke: #00ff00;
+      transition: stroke-dashoffset 1s linear;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>⏱ Hacker Countdown Timer</h1>
+  <input type="text" id="timeInput" value="00:01:00" maxlength="8" />
+  
+  <svg width="200" height="200">
+    <circle class="circle-bg" cx="100" cy="100" r="90" stroke-width="10" fill="none" />
+    <circle class="circle-progress" cx="100" cy="100" r="90" stroke-width="10" fill="none"
+      stroke-dasharray="565.48" stroke-dashoffset="0" />
+  </svg>
+
+  <div id="controls">
+    <button id="startBtn">Start</button>
+    <button id="pauseBtn">Pause</button>
+    <button id="resetBtn">Reset</button>
+  </div>
+
+  <script>
+    const input = document.getElementById('timeInput');
+    const startBtn = document.getElementById('startBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const progressCircle = document.querySelector('.circle-progress');
+
+    const RADIUS = 90;
+    const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+
+    let totalSeconds = 0;
+    let remainingSeconds = 0;
+    let timer;
+    let running = false;
+
+    function timeToSeconds(timeStr) {
+      const parts = timeStr.split(':').map(Number);
+      const [h, m, s] = [parts[0] || 0, parts[1] || 0, parts[2] || 0];
+      return h * 3600 + m * 60 + s;
+    }
+
+    function secondsToTime(sec) {
+      const h = String(Math.floor(sec / 3600)).padStart(2, '0');
+      const m = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
+      const s = String(sec % 60).padStart(2, '0');
+      return `${h}:${m}:${s}`;
+    }
+
+    function updateProgress() {
+      const offset = CIRCUMFERENCE * (1 - remainingSeconds / totalSeconds);
+      progressCircle.style.strokeDashoffset = offset;
+    }
+
+    function startTimer() {
+      if (running) return;
+      if (remainingSeconds <= 0) {
+        totalSeconds = timeToSeconds(input.value);
+        if (totalSeconds <= 0) return;
+        remainingSeconds = totalSeconds;
+      }
+
+      running = true;
+      timer = setInterval(() => {
+        if (remainingSeconds > 0) {
+          remainingSeconds--;
+          input.value = secondsToTime(remainingSeconds);
+          updateProgress();
+        } else {
+          clearInterval(timer);
+          running = false;
+        }
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      clearInterval(timer);
       running = false;
-      difference = 0;
-      document.getElementById('time').textContent = "00:00:00.00";
-    });
+    }
+
+    function resetTimer() {
+      clearInterval(timer);
+      running = false;
+      input.value = secondsToTime(totalSeconds);
+      remainingSeconds = totalSeconds;
+      updateProgress();
+    }
+
+    // Init
+    progressCircle.style.strokeDasharray = CIRCUMFERENCE;
+    progressCircle.style.strokeDashoffset = 0;
+
+    startBtn.addEventListener('click', startTimer);
+    pauseBtn.addEventListener('click', pauseTimer);
+    resetBtn.addEventListener('click', resetTimer);
   </script>
 </body>
 </html>
