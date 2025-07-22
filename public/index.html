@@ -92,16 +92,22 @@
   <audio id="beep" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto"></audio>
 
   <script>
-    // Matrix Rain Animation
+    // MATRIX RAIN
     const canvas = document.getElementById('matrixCanvas');
     const ctx = canvas.getContext('2d');
-    canvas.height = window.innerHeight;
-    canvas.width = window.innerWidth;
 
+    let columns, drops;
     const chars = "01";
     const fontSize = 14;
-    const columns = canvas.width / fontSize;
-    const drops = Array.from({ length: columns }).fill(1);
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      columns = Math.floor(canvas.width / fontSize);
+      drops = Array(columns).fill(1);
+    }
+
+    window.addEventListener('resize', resizeCanvas);
 
     function drawMatrix() {
       ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
@@ -117,13 +123,17 @@
         if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
           drops[i] = 0;
         }
+
         drops[i]++;
       }
     }
 
-    setInterval(drawMatrix, 33);
+    window.onload = () => {
+      resizeCanvas();
+      setInterval(drawMatrix, 33);
+    };
 
-    // Timer Logic
+    // TIMER LOGIC
     const input = document.getElementById('timeInput');
     const startBtn = document.getElementById('startBtn');
     const pauseBtn = document.getElementById('pauseBtn');
@@ -192,7 +202,6 @@
       updateProgress();
     }
 
-    // Keyboard support: Enter to start
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -200,11 +209,9 @@
       }
     });
 
-    // Init progress circle
     progressCircle.style.strokeDasharray = CIRCUMFERENCE;
     progressCircle.style.strokeDashoffset = 0;
 
-    // Button listeners
     startBtn.addEventListener('click', startTimer);
     pauseBtn.addEventListener('click', pauseTimer);
     resetBtn.addEventListener('click', resetTimer);
