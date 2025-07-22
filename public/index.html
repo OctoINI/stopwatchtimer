@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Countdown Timer</title>
+  <title>Hacker Countdown Timer</title>
   <style>
     body {
       background-color: #000;
@@ -20,6 +20,7 @@
       color: #00ff00;
       width: 180px;
       text-align: center;
+      outline: none;
     }
 
     #controls button {
@@ -56,7 +57,7 @@
 
   <h1>⏱ Hacker Countdown Timer</h1>
   <input type="text" id="timeInput" value="00:01:00" maxlength="8" />
-  
+
   <svg width="200" height="200">
     <circle class="circle-bg" cx="100" cy="100" r="90" stroke-width="10" fill="none" />
     <circle class="circle-progress" cx="100" cy="100" r="90" stroke-width="10" fill="none"
@@ -69,12 +70,16 @@
     <button id="resetBtn">Reset</button>
   </div>
 
+  <!-- Sound -->
+  <audio id="beep" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto"></audio>
+
   <script>
     const input = document.getElementById('timeInput');
     const startBtn = document.getElementById('startBtn');
     const pauseBtn = document.getElementById('pauseBtn');
     const resetBtn = document.getElementById('resetBtn');
     const progressCircle = document.querySelector('.circle-progress');
+    const beep = document.getElementById('beep');
 
     const RADIUS = 90;
     const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
@@ -119,6 +124,7 @@
         } else {
           clearInterval(timer);
           running = false;
+          beep.play();
         }
       }, 1000);
     }
