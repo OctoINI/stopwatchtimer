@@ -15,13 +15,14 @@
       height: 100%;
     }
 
+    /* matrix canvas sits behind countdown but above the black background */
     canvas#matrix {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      z-index: -1;
+      z-index: 0;       /* changed from -1 */
     }
 
     .container {
@@ -95,7 +96,7 @@
 <audio id="beep" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto"></audio>
 
 <script>
-  // Matrix Rain Effect
+  // Matrix Rain Effect with Retina support
   const canvas = document.getElementById("matrix");
   const ctx = canvas.getContext("2d");
 
@@ -104,13 +105,23 @@
   const letters = 'アァイィウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789'.split('');
 
   function initMatrix() {
-    width = canvas.width = window.innerWidth;
-    height = canvas.height = window.innerHeight;
+    const dpr = window.devicePixelRatio || 1;
+    width = window.innerWidth;
+    height = window.innerHeight;
+
+    // resize canvas to physical pixels
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+
+    // reset any transforms then scale to DPR
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
     columns = Math.floor(width / fontSize);
     drops = Array(columns).fill(1);
   }
 
   function drawMatrix() {
+    // translucent black fill for the fading trail
     ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
     ctx.fillRect(0, 0, width, height);
 
@@ -124,7 +135,6 @@
       if (drops[i] * fontSize > height && Math.random() > 0.975) {
         drops[i] = 0;
       }
-
       drops[i]++;
     }
 
@@ -133,10 +143,7 @@
 
   initMatrix();
   drawMatrix();
-
-  window.addEventListener("resize", () => {
-    initMatrix();
-  });
+  window.addEventListener("resize", initMatrix);
 
   // Timer Logic
   const input = document.getElementById('timeInput');
@@ -216,4 +223,3 @@
 </script>
 </body>
 </html>
-
