@@ -1,2 +1,103 @@
-<h1>About Us</h1>
-<p>This is the About page.</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About Us</title>
+  <style>
+    /* Reset & page setup */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: black;
+      font-family: 'Courier New', monospace;
+    }
+
+    /* Matrix canvas behind everything */
+    canvas#matrix {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: 0;
+    }
+
+    /* Centered content */
+    .content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+      color: #00ff00;
+    }
+    .content h1 {
+      font-size: 4rem;
+      margin-bottom: 0.5em;
+    }
+    .content p {
+      font-size: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="matrix"></canvas>
+
+  <div class="content">
+    <h1>About Us</h1>
+    <p>This is a solo project made by Jerrod B. I only did it for fun!</p>
+  </div>
+
+  <script>
+    // MATRIX RAIN
+    const canvas = document.getElementById('matrix');
+    const ctx    = canvas.getContext('2d');
+    const letters= 'アァイィウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789'.split('');
+    const fontSize = 16;
+    let width, height, columns, drops;
+
+    function initMatrix() {
+      const dpr = window.devicePixelRatio || 1;
+      width  = window.innerWidth;
+      height = window.innerHeight;
+      
+      canvas.width  = width * dpr;
+      canvas.height = height * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      columns = Math.floor(width / fontSize);
+      drops   = Array(columns).fill(1);
+    }
+
+    function drawMatrix() {
+      // Trail effect
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.fillStyle = '#00ff00';
+      ctx.font = `${fontSize}px monospace`;
+
+      for (let i = 0; i < drops.length; i++) {
+        const char = letters[Math.floor(Math.random() * letters.length)];
+        ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+
+      requestAnimationFrame(drawMatrix);
+    }
+
+    initMatrix();
+    drawMatrix();
+    window.addEventListener('resize', initMatrix);
+  </script>
+
+</body>
+</html>
