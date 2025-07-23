@@ -32,7 +32,7 @@
       align-items: center;
       height: 100vh;
       text-align: center;
-      color: #00ff00;
+      color: hotpink; /* Changed here */
     }
     .content h1 {
       font-size: 4rem;
@@ -74,31 +74,31 @@
     }
 
     function drawMatrix() {
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  ctx.fillStyle = '#00ff00';
-  ctx.font = fontSize + 'px monospace';
+      ctx.fillStyle = '#00ff00'; // Matrix rain remains green
+      ctx.font = fontSize + 'px monospace';
 
-  for (let i = 0; i < drops.length; i++) {
-    const text = letters[Math.floor(Math.random() * letters.length)];
-    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+      for (let i = 0; i < drops.length; i++) {
+        const text = letters[Math.floor(Math.random() * letters.length)];
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
 
-    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-      drops[i] = 0;
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+
+        drops[i]++;
+      }
+
+      setTimeout(() => requestAnimationFrame(drawMatrix), 40);
     }
 
-    drops[i]++;
-  }
-
-  setTimeout(() => requestAnimationFrame(drawMatrix), 40); // slow down animation
-}
-
-initMatrix();
-drawMatrix();
-window.addEventListener("resize", () => {
-  initMatrix();  // recalculates width, height, columns, and resets drops
-});
+    initMatrix();
+    drawMatrix();
+    window.addEventListener("resize", () => {
+      initMatrix();
+    });
   </script>
 
 </body>
