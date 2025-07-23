@@ -14,7 +14,7 @@
       font-family: 'Courier New', monospace;
     }
 
-    /* Matrix canvas behind everything */
+    /* Matrix canvas */
     canvas#matrix {
       position: fixed;
       top: 0; left: 0;
@@ -32,15 +32,43 @@
       align-items: center;
       height: 100vh;
       text-align: center;
-      color: hotpink; /* Changed here */
+      color: hotpink;
+      padding: 0 20px;
     }
-    .content h1 {
-      font-size: 4rem;
-      margin-bottom: 0.5em;
+
+    .wave {
+      display: inline-block;
     }
-    .content p {
-      font-size: 1.5rem;
+
+    .wave span {
+      display: inline-block;
+      animation: wave 1.5s ease-in-out infinite;
     }
+
+    .wave span:nth-child(odd) {
+      animation-delay: 0.1s;
+    }
+    .wave span:nth-child(even) {
+      animation-delay: 0.3s;
+    }
+
+    @keyframes wave {
+      0%, 100% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+
+    h1, p {
+      font-size: 2rem;
+      margin-bottom: 1em;
+    }
+
+    h1.wave span { font-size: 3.5rem; }
+    p.wave span { font-size: 1.5rem; }
+
   </style>
 </head>
 <body>
@@ -48,36 +76,48 @@
   <canvas id="matrix"></canvas>
 
   <div class="content">
-    <h1>About Us</h1>
-    <p>This is a solo project made by Jerrod B. I only did it for fun!</p>
+    <h1 class="wave">
+      <!-- Each letter in a span for animation -->
+      <span>A</span><span>b</span><span>o</span><span>u</span><span>t</span>
+      <span>&nbsp;</span>
+      <span>U</span><span>s</span>
+    </h1>
+    <p class="wave">
+      <span>T</span><span>h</span><span>i</span><span>s</span><span>&nbsp;</span>
+      <span>i</span><span>s</span><span>&nbsp;</span>
+      <span>a</span><span>&nbsp;</span>
+      <span>s</span><span>o</span><span>l</span><span>o</span><span>&nbsp;</span>
+      <span>p</span><span>r</span><span>o</span><span>j</span><span>e</span><span>c</span><span>t</span><span>&nbsp;</span>
+      <span>b</span><span>y</span><span>&nbsp;</span><span>J</span><span>e</span><span>r</span><span>r</span><span>o</span><span>d</span><span>&nbsp;</span><span>B</span><span>.</span>
+    </p>
   </div>
 
   <script>
     // MATRIX RAIN
     const canvas = document.getElementById('matrix');
-    const ctx    = canvas.getContext('2d');
-    const letters= 'アァイィウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789'.split('');
+    const ctx = canvas.getContext('2d');
+    const letters = 'アァイィウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789'.split('');
     const fontSize = 16;
     let width, height, columns, drops;
 
     function initMatrix() {
       const dpr = window.devicePixelRatio || 1;
-      width  = window.innerWidth;
+      width = window.innerWidth;
       height = window.innerHeight;
       
-      canvas.width  = width * dpr;
+      canvas.width = width * dpr;
       canvas.height = height * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
       columns = Math.floor(width / fontSize);
-      drops   = Array(columns).fill(1);
+      drops = Array(columns).fill(1);
     }
 
     function drawMatrix() {
       ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.fillStyle = '#00ff00'; // Matrix rain remains green
+      ctx.fillStyle = '#00ff00';
       ctx.font = fontSize + 'px monospace';
 
       for (let i = 0; i < drops.length; i++) {
@@ -96,9 +136,7 @@
 
     initMatrix();
     drawMatrix();
-    window.addEventListener("resize", () => {
-      initMatrix();
-    });
+    window.addEventListener("resize", initMatrix);
   </script>
 
 </body>
