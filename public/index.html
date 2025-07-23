@@ -14,7 +14,6 @@
       font-family: 'Courier New', monospace;
       height: 100%;
     }
-
     canvas#matrix {
       position: fixed;
       top: 0;
@@ -23,18 +22,15 @@
       height: 100vh;
       z-index: 0;
     }
-
     .container {
       position: relative;
       text-align: center;
       padding-top: 50px;
       z-index: 1;
     }
-
     #navLinks {
       margin: 20px 0;
     }
-
     #navLinks a {
       color: #00ff00;
       text-decoration: none;
@@ -46,11 +42,9 @@
       transition: background-color 0.3s ease;
       border-radius: 4px;
     }
-
     #navLinks a:hover {
       background-color: #003300;
     }
-
     #timeInput {
       font-size: 32px;
       background: black;
@@ -60,11 +54,9 @@
       text-align: center;
       outline: none;
     }
-
     #timeInput.invalid {
       border-color: red;
     }
-
     #controls button,
     .quick-buttons button {
       background: black;
@@ -76,26 +68,21 @@
       cursor: pointer;
       border-radius: 4px;
     }
-
     #controls button:hover,
     .quick-buttons button:hover {
       background-color: #003300;
     }
-
     .quick-buttons {
       margin: 10px 0 20px;
     }
-
     svg {
       transform: rotate(-90deg);
       margin: 40px auto;
       display: block;
     }
-
     .circle-bg {
       stroke: #333;
     }
-
     .circle-progress {
       stroke: #00ff00;
       transition: stroke-dashoffset 0.1s linear;
@@ -136,13 +123,12 @@
   </div>
 </div>
 
-<audio id="beep" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto"></audio>
+<audio id="beep" src="alarm.mp3" preload="auto"></audio>
 
 <script>
   // Matrix Background
   const canvas = document.getElementById("matrix");
   const ctx = canvas.getContext("2d");
-
   const fontSize = 12;
   const letters = 'アァイィウエオカキクケコサシスセソタチツテトナニヌネノ0123456789'.split('');
   let columns, drops;
@@ -186,9 +172,9 @@
 
   function timeToSeconds(timeStr) {
     const parts = timeStr.split(':').map(p => parseInt(p, 10));
-    if (parts.length !== 3 || parts.some(isNaN)) return null;
+    if (parts.length !== 3 || parts.some(p => isNaN(p))) return null;
     const [h, m, s] = parts;
-    if (m > 59 || s > 59 || h < 0 || m < 0 || s < 0) return null;
+    if (m >= 60 || s >= 60 || h < 0 || m < 0 || s < 0) return null;
     return h * 3600 + m * 60 + s;
   }
 
@@ -246,7 +232,7 @@
   function resetTimer() {
     if (rafId) cancelAnimationFrame(rafId);
     running = false;
-    input.value = secondsToTime(totalSeconds);
+    input.value = secondsToTime(totalSeconds || 0);
     updateProgress(1);
   }
 
