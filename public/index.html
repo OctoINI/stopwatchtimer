@@ -98,6 +98,7 @@
 <div class="container">
   <h1>⏱Countdown Timer</h1>
   
+  <!-- Navigation Links -->
   <div id="navLinks">
     <a href="/about/">About</a>
     <a href="/donate/">Donate</a>
@@ -201,13 +202,13 @@
 
   function startTimer() {
     if (running) return;
-    if (remainingSeconds <= 0) {
-      totalSeconds = timeToSeconds(input.value);
-      if (totalSeconds <= 0) return;
-      remainingSeconds = totalSeconds;
-    }
 
+    totalSeconds = timeToSeconds(input.value);
+    if (totalSeconds <= 0) return;
+
+    remainingSeconds = totalSeconds;
     running = true;
+
     timer = setInterval(() => {
       if (remainingSeconds > 0) {
         remainingSeconds--;
@@ -234,20 +235,20 @@
     updateProgress();
   }
 
+  input.addEventListener('input', () => {
+    if (!running) {
+      totalSeconds = timeToSeconds(input.value);
+      remainingSeconds = totalSeconds;
+      updateProgress();
+    }
+  });
+
   progressCircle.style.strokeDasharray = CIRCUMFERENCE;
   progressCircle.style.strokeDashoffset = 0;
 
   startBtn.addEventListener('click', startTimer);
   pauseBtn.addEventListener('click', pauseTimer);
   resetBtn.addEventListener('click', resetTimer);
-
-  // ✅ Auto-format input into HH:MM:SS as user types
-  input.addEventListener('input', () => {
-    const raw = input.value.replace(/[^0-9]/g, '').padStart(6, '0').slice(-6);
-    const formatted = raw.replace(/(\d{2})(\d{2})(\d{2})/, '$1:$2:$3');
-    input.value = formatted;
-  });
-  input.dispatchEvent(new Event('input'));
 </script>
 </body>
 </html>
