@@ -1,3 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smooth Countdown Timer</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: black;
+      color: #ff69b4;
+      font-family: 'Courier New', monospace;
+      height: 100%;
+    }
+    canvas#matrix {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+    }
+    #overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: hotpink;
+      opacity: 0;
+      z-index: 5;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+    .container {
+      position: relative;
+      text-align: center;
+      padding-top: 50px;
+      z-index: 1;
+    }
+    #navLinks {
+      margin: 20px 0;
+    }
+    #navLinks a {
+      color: #ff69b4;
+      text-decoration: none;
+      margin: 0 15px;
+      font-size: 18px;
+      border: 2px solid #ff69b4;
+      padding: 6px 12px;
+      display: inline-block;
+      transition: background-color 0.3s ease;
+      border-radius: 4px;
+    }
+    #navLinks a:hover {
+      background-color: #330022;
+    }
+    #timeInput {
+      font-size: 32px;
+      background: black;
+      border: 2px solid #ff69b4;
+      color: #ff69b4;
+      width: 180px;
+      text-align: center;
+      outline: none;
+    }
+    #timeInput.invalid {
+      border-color: red;
+    }
+    #controls button,
+    .quick-buttons button {
+      background: black;
+      color: #ff69b4;
+      border: 2px solid #ff69b4;
+      font-size: 18px;
+      margin: 10px;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    #controls button:hover,
+    .quick-buttons button:hover {
+      background-color: #330022;
+    }
+    .quick-buttons {
+      margin: 10px 0 20px;
+    }
+    svg {
+      transform: rotate(-90deg);
+      margin: 40px auto;
+      display: block;
+    }
+    .circle-bg {
+      stroke: #333;
+    }
+    .circle-progress {
+      stroke: #ff69b4;
+      transition: stroke-dashoffset 0.1s linear;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="matrix"></canvas>
+<div id="overlay"></div>
+
+<div class="container">
+  <h1>⏱ Countdown Timer ⏱</h1>
+  
+  <div id="navLinks">
+    <a href="/about/">About</a>
+    <a href="/donate/">Donate</a>
+  </div>
+
+  <input type="text" id="timeInput" value="00:01:00" maxlength="8" />
+
+  <div class="quick-buttons">
+    <button onclick="setQuickTime(30)">30s</button>
+    <button onclick="setQuickTime(60)">1min</button>
+    <button onclick="setQuickTime(300)">5min</button>
+    <button onclick="setQuickTime(600)">10min</button>
+  </div>
+
+  <svg width="200" height="200">
+    <circle class="circle-bg" cx="100" cy="100" r="90" stroke-width="10" fill="none" />
+    <circle class="circle-progress" cx="100" cy="100" r="90" stroke-width="10" fill="none"
+      stroke-dasharray="565.48" stroke-dashoffset="0" />
+  </svg>
+
+  <div id="controls">
+    <button id="startBtn">Start</button>
+    <button id="pauseBtn">Pause</button>
+    <button id="resetBtn">Reset</button>
+  </div>
+</div>
+
+<audio id="beep" src="alarm.mp3" preload="auto"></audio>
+
 <script>
   // Matrix Background
   const canvas = document.getElementById("matrix");
@@ -43,13 +182,12 @@
   const RADIUS = 90;
   const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
   let totalSeconds = 0, startTime = 0, running = false, rafId = null;
-  let lastSetSeconds = 0;
 
   function timeToSeconds(timeStr) {
     const parts = timeStr.split(':').map(p => parseInt(p, 10));
     if (parts.length !== 3 || parts.some(p => isNaN(p))) return null;
     const [h, m, s] = parts;
-    if (h < 0 || m < 0 || s < 0 || m >= 60 || s >= 60) return null;
+    if (m >= 60 || s >= 60 || h < 0 || m < 0 || s < 0) return null;
     return h * 3600 + m * 60 + s;
   }
 
@@ -88,6 +226,8 @@
     } else {
       running = false;
       beep.play();
+
+      // Flash screen
       overlay.style.opacity = '0.8';
       setTimeout(() => overlay.style.opacity = '0', 400);
     }
@@ -96,10 +236,8 @@
   function startTimer() {
     if (running || !validateInput()) return;
     totalSeconds = timeToSeconds(input.value);
-    lastSetSeconds = totalSeconds; // Remember last valid set time
     startTime = null;
     running = true;
-    updateProgress(1);
     rafId = requestAnimationFrame(animateCountdown);
   }
 
@@ -111,12 +249,11 @@
   function resetTimer() {
     if (rafId) cancelAnimationFrame(rafId);
     running = false;
-    input.value = secondsToTime(lastSetSeconds);
+    input.value = secondsToTime(totalSeconds || 0);
     updateProgress(1);
   }
 
   function setQuickTime(seconds) {
-    lastSetSeconds = seconds;
     totalSeconds = seconds;
     input.value = secondsToTime(seconds);
     updateProgress(1);
@@ -128,11 +265,11 @@
   document.getElementById('resetBtn').addEventListener('click', resetTimer);
 
   input.addEventListener('input', () => {
-    if (validateInput()) {
+    validateInput();
+    if (!running) {
       const val = timeToSeconds(input.value);
-      if (!running && val !== null) {
+      if (val !== null) {
         totalSeconds = val;
-        lastSetSeconds = val;
         updateProgress(1);
       }
     }
@@ -141,3 +278,5 @@
   progressCircle.style.strokeDasharray = CIRCUMFERENCE;
   progressCircle.style.strokeDashoffset = 0;
 </script>
+</body>
+</html>
