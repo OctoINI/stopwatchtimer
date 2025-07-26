@@ -29,38 +29,27 @@
       z-index: 1;
     }
     #timeInput {
-      font-size: 32px;
+      font-size: 80px;
       background: black;
-      border: 2px solid #ff69b4;
+      border: none;
       color: #ff69b4;
-      width: 180px;
+      width: auto;
       text-align: center;
       outline: none;
+      margin: 30px 0;
     }
     #controls button {
       background: black;
       color: #ff69b4;
       border: 2px solid #ff69b4;
-      font-size: 18px;
+      font-size: 22px;
       margin: 10px;
-      padding: 10px 20px;
+      padding: 12px 24px;
       cursor: pointer;
       border-radius: 4px;
     }
     #controls button:hover {
       background-color: #330022;
-    }
-    svg {
-      transform: rotate(-90deg);
-      margin: 40px auto;
-      display: block;
-    }
-    .circle-bg {
-      stroke: #333;
-    }
-    .circle-progress {
-      stroke: #ff69b4;
-      transition: stroke-dashoffset 0.1s linear;
     }
   </style>
 </head>
@@ -70,14 +59,8 @@
 
 <div class="container">
   <h1>⏱ Stopwatch ⏱</h1>
-  
-  <input type="text" id="timeInput" value="00:00:00" readonly />
 
-  <svg width="200" height="200">
-    <circle class="circle-bg" cx="100" cy="100" r="90" stroke-width="10" fill="none" />
-    <circle class="circle-progress" cx="100" cy="100" r="90" stroke-width="10" fill="none"
-      stroke-dasharray="565.48" stroke-dashoffset="0" />
-  </svg>
+  <input type="text" id="timeInput" value="00:00:00" readonly />
 
   <div id="controls">
     <button id="startBtn">Start</button>
@@ -125,9 +108,6 @@
 
   // Stopwatch Logic
   const input = document.getElementById('timeInput');
-  const progressCircle = document.querySelector('.circle-progress');
-  const RADIUS = 90;
-  const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
   let startTime = null, running = false, rafId = null, pausedTime = 0;
 
   function secondsToTime(sec) {
@@ -137,18 +117,10 @@
     return `${h}:${m}:${s}`;
   }
 
-  function updateProgress(seconds) {
-    // Limit to 1 hour cycle for visual loop
-    const ratio = (seconds % 3600) / 3600;
-    const offset = CIRCUMFERENCE * (1 - ratio);
-    progressCircle.style.strokeDashoffset = offset;
-  }
-
   function animateStopwatch(timestamp) {
     if (!startTime) startTime = timestamp;
     const elapsed = (timestamp - startTime) / 1000 + pausedTime;
     input.value = secondsToTime(Math.floor(elapsed));
-    updateProgress(elapsed);
     rafId = requestAnimationFrame(animateStopwatch);
   }
 
@@ -172,7 +144,6 @@
     running = false;
     pausedTime = 0;
     input.value = "00:00:00";
-    updateProgress(0);
   }
 
   function parseTime(timeStr) {
@@ -183,9 +154,6 @@
   document.getElementById('startBtn').addEventListener('click', startTimer);
   document.getElementById('pauseBtn').addEventListener('click', pauseTimer);
   document.getElementById('resetBtn').addEventListener('click', resetTimer);
-
-  progressCircle.style.strokeDasharray = CIRCUMFERENCE;
-  progressCircle.style.strokeDashoffset = CIRCUMFERENCE;
 </script>
 </body>
 </html>
