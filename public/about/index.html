@@ -2,20 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>(⌐■_■) About this Project (-‿◦☀)</title>
   <style>
     /* Reset & page setup */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
-      width: 100%;
-      min-height: 100%;
+      width: 100%; height: 100%;
+      overflow: hidden;
       background: black;
       font-family: 'Courier New', monospace;
-      color: hotpink;
-      /* allow vertical scroll */
-      overflow-y: auto;
-      -webkit-text-size-adjust: 100%;
     }
 
     /* Matrix canvas */
@@ -34,16 +30,14 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
+      height: 100vh;
       text-align: center;
-      padding: 0 5vw;
-      max-width: 480px;
-      margin: 0 auto;
+      color: hotpink;
+      padding: 0 20px;
     }
 
     .wave {
       display: inline-block;
-      user-select: none;
     }
 
     .wave span {
@@ -68,31 +62,13 @@
     }
 
     h1, p {
-      font-size: 6vw;
+      font-size: 2rem;
       margin-bottom: 1em;
-      line-height: 1.1;
     }
 
-    h1.wave span {
-      font-size: 9vw;
-    }
+    h1.wave span { font-size: 3.5rem; }
+    p.wave span { font-size: 1.5rem; }
 
-    p.wave span {
-      font-size: 4.5vw;
-    }
-
-    /* Smaller devices tweaks */
-    @media (max-width: 400px) {
-      h1, p {
-        font-size: 7vw;
-      }
-      h1.wave span {
-        font-size: 11vw;
-      }
-      p.wave span {
-        font-size: 5.5vw;
-      }
-    }
   </style>
 </head>
 <body>
@@ -129,7 +105,7 @@
       const dpr = window.devicePixelRatio || 1;
       width = window.innerWidth;
       height = window.innerHeight;
-
+      
       canvas.width = width * dpr;
       canvas.height = height * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
