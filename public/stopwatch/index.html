@@ -9,13 +9,14 @@
     html, body {
       margin: 0;
       padding: 0;
-      overflow-y: auto; /* allow vertical scroll on mobile */
+      overflow-y: auto;
       background: black;
       color: #ff69b4;
       font-family: 'Courier New', monospace;
       height: 100%;
       -webkit-text-size-adjust: 100%;
     }
+
     canvas#matrix {
       position: fixed;
       top: 0;
@@ -24,70 +25,74 @@
       height: 100vh;
       z-index: 0;
     }
+
     .container {
       position: relative;
       text-align: center;
-      padding: 3vh 1vw 50px;
+      padding: 5vh 2vw;
       z-index: 1;
-      max-width: 480px;
+      max-width: 600px;
       margin: 0 auto;
     }
+
     h1 {
-      font-size: 8vw;
-      margin-top: 0;
-      margin-bottom: 2vh;
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
     }
+
     #timeInput {
-      font-size: 15vw;
+      font-size: 3rem;
       background: black;
       border: none;
       color: #ff69b4;
-      width: 90vw;
+      width: 100%;
       max-width: 400px;
       text-align: center;
       outline: none;
-      margin: 3vh 0 4vh;
+      margin: 2rem auto;
       border-radius: 6px;
       user-select: none;
     }
+
     #controls {
       display: flex;
       justify-content: center;
+      gap: 1rem;
       flex-wrap: wrap;
-      gap: 1vw;
     }
+
     #controls button {
       background: black;
       color: #ff69b4;
       border: 2px solid #ff69b4;
-      font-size: 5vw;
-      padding: 1.2em 2em;
+      font-size: 1.25rem;
+      padding: 0.75rem 1.5rem;
       cursor: pointer;
       border-radius: 6px;
-      min-width: 100px;
-      box-sizing: border-box;
-      touch-action: manipulation;
-      user-select: none;
+      min-width: 120px;
       transition: background-color 0.3s ease;
+      user-select: none;
     }
+
     #controls button:hover,
     #controls button:focus {
       background-color: #330022;
       outline: none;
     }
-    /* Smaller screens adjustments */
-    @media (max-width: 400px) {
+
+    /* Responsive tweaks for small screens */
+    @media (max-width: 480px) {
       h1 {
-        font-size: 9vw;
+        font-size: 1.8rem;
       }
       #timeInput {
-        font-size: 18vw;
-        width: 95vw;
+        font-size: 2.2rem;
+        width: 90vw;
       }
       #controls button {
-        font-size: 6vw;
-        min-width: 80px;
-        padding: 1em 1.5em;
+        font-size: 1rem;
+        padding: 0.6rem 1.2rem;
+        min-width: 100px;
       }
     }
   </style>
@@ -98,9 +103,7 @@
 
   <div class="container">
     <h1>⏱ Stopwatch ⏱</h1>
-
     <input type="text" id="timeInput" value="00:00:00" readonly aria-label="Stopwatch time display" />
-
     <div id="controls" role="group" aria-label="Stopwatch controls">
       <button id="startBtn" type="button">Start</button>
       <button id="pauseBtn" type="button">Pause</button>
