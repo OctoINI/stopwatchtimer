@@ -2,15 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Donate</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
-      width: 100%; height: 100%;
-      overflow: hidden;
+      width: 100%;
+      min-height: 100%;
       background: black;
       font-family: 'Courier New', monospace;
+      color: hotpink;
+      /* allow vertical scroll */
+      overflow-y: auto;
+      -webkit-text-size-adjust: 100%;
     }
 
     canvas#matrix {
@@ -27,42 +31,51 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
       text-align: center;
-      color: hotpink;
-      padding: 0 20px;
+      padding: 0 5vw;
+      max-width: 480px;
+      margin: 0 auto;
     }
 
     .content h1, .content p, .cashapp-tag {
       animation: wave 2s infinite ease-in-out;
       display: inline-block;
+      user-select: none;
     }
 
     .content h1 {
-      font-size: 4rem;
+      font-size: 10vw;
       margin-bottom: 0.5em;
+      line-height: 1.1;
     }
 
     .content p {
-      font-size: 1.5rem;
+      font-size: 5vw;
       margin-bottom: 1.5em;
+      max-width: 90vw;
     }
 
     .cashapp-tag {
-      font-size: 2.5rem;
+      font-size: 7vw;
       font-weight: bold;
       background: #330033;
       border: 2px solid hotpink;
       padding: 15px 40px;
       border-radius: 10px;
-      user-select: all;
       cursor: pointer;
       transition: background-color 0.3s;
-      color: hotpink;
+      user-select: all;
+      max-width: 90vw;
+      white-space: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
-    .cashapp-tag:hover {
+    .cashapp-tag:hover,
+    .cashapp-tag:focus {
       background-color: #660066;
+      outline: none;
     }
 
     @keyframes wave {
@@ -70,6 +83,20 @@
       25% { transform: translateY(-6px); }
       50% { transform: translateY(0px); }
       75% { transform: translateY(6px); }
+    }
+
+    /* Smaller devices tweaks */
+    @media (max-width: 400px) {
+      .content h1 {
+        font-size: 12vw;
+      }
+      .content p {
+        font-size: 6vw;
+      }
+      .cashapp-tag {
+        font-size: 8vw;
+        padding: 12px 25px;
+      }
     }
   </style>
 </head>
@@ -80,7 +107,7 @@
   <div class="content">
     <h1>Support the Project</h1>
     <p>If you enjoy my work, feel free to donate!</p>
-    <div class="cashapp-tag" title="Click to copy">$jerrodbuckridge</div>
+    <div class="cashapp-tag" tabindex="0" role="button" aria-label="Copy Cash App tag $jerrodbuckridge" title="Click or tap to copy">$jerrodbuckridge</div>
   </div>
 
   <script>
@@ -95,7 +122,7 @@
       const dpr = window.devicePixelRatio || 1;
       width = window.innerWidth;
       height = window.innerHeight;
-      
+
       canvas.width = width * dpr;
       canvas.height = height * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -127,17 +154,28 @@
 
     initMatrix();
     drawMatrix();
-    window.addEventListener("resize", () => initMatrix());
+    window.addEventListener("resize", initMatrix);
 
-    // Copy Cash App tag on click
+    // Copy Cash App tag on click or keyboard enter/space
     const cashAppDiv = document.querySelector('.cashapp-tag');
-    cashAppDiv.addEventListener('click', () => {
+
+    function copyCashAppTag() {
       navigator.clipboard.writeText(cashAppDiv.textContent).then(() => {
-        cashAppDiv.textContent = 'Copied! $jerrodbuckridge';
+        const original = '$jerrodbuckridge';
+        cashAppDiv.textContent = 'Copied! ' + original;
         setTimeout(() => {
-          cashAppDiv.textContent = '$jerrodbuckridge';
+          cashAppDiv.textContent = original;
         }, 2000);
       });
+    }
+
+    cashAppDiv.addEventListener('click', copyCashAppTag);
+
+    cashAppDiv.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        copyCashAppTag();
+      }
     });
   </script>
 

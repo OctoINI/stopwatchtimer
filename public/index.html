@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Smooth Countdown Timer</title>
 
-  <!-- ✅ Favicon -->
+  <!-- Favicon -->
   <link rel="icon" type="image/x-icon" href="/clocktime.ico" />
   <link rel="shortcut icon" href="/clocktime.ico" type="image/x-icon" />
 
@@ -13,11 +13,12 @@
     html, body {
       margin: 0;
       padding: 0;
-      overflow: hidden;
+      overflow-y: auto; /* Allow vertical scroll on mobile */
       background: black;
       color: #ff69b4;
       font-family: 'Courier New', monospace;
       height: 100%;
+      -webkit-text-size-adjust: 100%; /* Prevent font resizing on iOS */
     }
     canvas#matrix {
       position: fixed;
@@ -41,34 +42,48 @@
     .container {
       position: relative;
       text-align: center;
-      padding-top: 50px;
+      padding: 3vh 1vw 50px;
       z-index: 1;
+      max-width: 480px;
+      margin: 0 auto;
     }
     #navLinks {
-      margin: 20px 0;
+      margin: 2vh 0;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1vw;
     }
     #navLinks a {
       color: #ff69b4;
       text-decoration: none;
-      margin: 0 15px;
-      font-size: 18px;
+      font-size: 4vw;
       border: 2px solid #ff69b4;
-      padding: 6px 12px;
-      display: inline-block;
-      transition: background-color 0.3s ease;
+      padding: 0.6em 1em;
       border-radius: 4px;
+      transition: background-color 0.3s ease;
+      flex: 1 1 30%;
+      max-width: 120px;
+      box-sizing: border-box;
     }
-    #navLinks a:hover {
+    #navLinks a:hover,
+    #navLinks a:focus {
       background-color: #330022;
     }
     #timeInput {
-      font-size: 32px;
+      font-size: 7vw;
       background: black;
       border: 2px solid #ff69b4;
       color: #ff69b4;
-      width: 180px;
+      width: 80vw;
+      max-width: 300px;
       text-align: center;
       outline: none;
+      border-radius: 6px;
+      padding: 0.25em 0;
+      margin: 1.5vh 0;
+      box-sizing: border-box;
+      touch-action: manipulation;
     }
     #timeInput.invalid {
       border-color: red;
@@ -78,23 +93,37 @@
       background: black;
       color: #ff69b4;
       border: 2px solid #ff69b4;
-      font-size: 18px;
-      margin: 10px;
-      padding: 10px 20px;
+      font-size: 5vw;
+      margin: 0.8vh 0.5vw;
+      padding: 0.8em 1.5em;
       cursor: pointer;
-      border-radius: 4px;
+      border-radius: 6px;
+      min-width: 90px;
+      box-sizing: border-box;
+      touch-action: manipulation;
+      user-select: none;
     }
     #controls button:hover,
-    .quick-buttons button:hover {
+    .quick-buttons button:hover,
+    #controls button:focus,
+    .quick-buttons button:focus {
       background-color: #330022;
+      outline: none;
     }
     .quick-buttons {
-      margin: 10px 0 20px;
+      margin: 1vh 0 2vh;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1vw;
     }
     svg {
       transform: rotate(-90deg);
-      margin: 40px auto;
+      margin: 4vh auto;
       display: block;
+      width: 80vw;
+      max-width: 300px;
+      height: auto;
     }
     .circle-bg {
       stroke: #333;
@@ -103,186 +132,205 @@
       stroke: #ff69b4;
       transition: stroke-dashoffset 0.1s linear;
     }
+
+    /* Responsive text scaling for small devices */
+    @media (max-width: 400px) {
+      #navLinks a {
+        font-size: 5vw;
+        max-width: 100px;
+      }
+      #timeInput {
+        font-size: 8vw;
+        width: 90vw;
+      }
+      #controls button,
+      .quick-buttons button {
+        font-size: 6vw;
+        padding: 0.7em 1em;
+        min-width: 70px;
+      }
+    }
   </style>
 </head>
 <body>
 
-<canvas id="matrix"></canvas>
-<div id="overlay"></div>
+  <canvas id="matrix"></canvas>
+  <div id="overlay"></div>
 
-<div class="container">
-  <h1>⏱ Countdown Timer ⏱</h1>
-  
-  <div id="navLinks">
-    <a href="/stopwatch/">Stopwatch</a>
-    <a href="/about/">About</a>
-    <a href="/donate/">Donate</a>
+  <div class="container">
+    <h1>⏱ Countdown Timer ⏱</h1>
+    
+    <nav id="navLinks" role="navigation" aria-label="Main navigation">
+      <a href="/stopwatch/">Stopwatch</a>
+      <a href="/about/">About</a>
+      <a href="/donate/">Donate</a>
+    </nav>
+
+    <input type="text" id="timeInput" value="00:01:00" maxlength="8" aria-label="Time input (HH:MM:SS)" />
+
+    <div class="quick-buttons" role="group" aria-label="Quick time buttons">
+      <button onclick="setQuickTime(30)">30s</button>
+      <button onclick="setQuickTime(60)">1min</button>
+      <button onclick="setQuickTime(300)">5min</button>
+      <button onclick="setQuickTime(600)">10min</button>
+    </div>
+
+    <svg width="200" height="200" role="img" aria-label="Countdown progress circle">
+      <circle class="circle-bg" cx="100" cy="100" r="90" stroke-width="10" fill="none" />
+      <circle class="circle-progress" cx="100" cy="100" r="90" stroke-width="10" fill="none"
+        stroke-dasharray="565.48" stroke-dashoffset="0" />
+    </svg>
+
+    <div id="controls">
+      <button id="startBtn">Start</button>
+      <button id="pauseBtn">Pause</button>
+      <button id="resetBtn">Reset</button>
+    </div>
   </div>
 
-  <input type="text" id="timeInput" value="00:01:00" maxlength="8" />
+  <audio id="beep" src="alarm.mp3" preload="auto"></audio>
 
-  <div class="quick-buttons">
-    <button onclick="setQuickTime(30)">30s</button>
-    <button onclick="setQuickTime(60)">1min</button>
-    <button onclick="setQuickTime(300)">5min</button>
-    <button onclick="setQuickTime(600)">10min</button>
-  </div>
+  <script>
+    // Matrix Background
+    const canvas = document.getElementById("matrix");
+    const ctx = canvas.getContext("2d");
+    const fontSize = 12;
+    const letters = 'アァイィウエオカキクケコサシスセソタチツテトナニヌネノ0123456789'.split('');
+    let columns, drops;
 
-  <svg width="200" height="200">
-    <circle class="circle-bg" cx="100" cy="100" r="90" stroke-width="10" fill="none" />
-    <circle class="circle-progress" cx="100" cy="100" r="90" stroke-width="10" fill="none"
-      stroke-dasharray="565.48" stroke-dashoffset="0" />
-  </svg>
-
-  <div id="controls">
-    <button id="startBtn">Start</button>
-    <button id="pauseBtn">Pause</button>
-    <button id="resetBtn">Reset</button>
-  </div>
-</div>
-
-<audio id="beep" src="alarm.mp3" preload="auto"></audio>
-
-<script>
-  // Matrix Background
-  const canvas = document.getElementById("matrix");
-  const ctx = canvas.getContext("2d");
-  const fontSize = 12;
-  const letters = 'アァイィウエオカキクケコサシスセソタチツテトナニヌネノ0123456789'.split('');
-  let columns, drops;
-
-  function initMatrix() {
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = window.innerWidth * dpr;
-    canvas.height = window.innerHeight * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    columns = Math.floor(window.innerWidth / fontSize);
-    drops = Array(columns).fill(1);
-  }
-
-  function drawMatrix() {
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#00FF00';
-    ctx.font = fontSize + 'px monospace';
-
-    for (let i = 0; i < drops.length; i++) {
-      const text = letters[Math.floor(Math.random() * letters.length)];
-      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-      drops[i]++;
+    function initMatrix() {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      columns = Math.floor(window.innerWidth / fontSize);
+      drops = Array(columns).fill(1);
     }
 
-    setTimeout(() => requestAnimationFrame(drawMatrix), 40);
-  }
+    function drawMatrix() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#00FF00';
+      ctx.font = fontSize + 'px monospace';
 
-  initMatrix();
-  drawMatrix();
-  window.addEventListener("resize", initMatrix);
+      for (let i = 0; i < drops.length; i++) {
+        const text = letters[Math.floor(Math.random() * letters.length)];
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+      }
 
-  // Timer Logic
-  const input = document.getElementById('timeInput');
-  const progressCircle = document.querySelector('.circle-progress');
-  const beep = document.getElementById('beep');
-  const overlay = document.getElementById('overlay');
-  const RADIUS = 90;
-  const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
-  let totalSeconds = 0, startTime = 0, running = false, rafId = null;
-
-  function timeToSeconds(timeStr) {
-    const parts = timeStr.split(':').map(p => parseInt(p, 10));
-    if (parts.length !== 3 || parts.some(p => isNaN(p))) return null;
-    const [h, m, s] = parts;
-    if (m >= 60 || s >= 60 || h < 0 || m < 0 || s < 0) return null;
-    return h * 3600 + m * 60 + s;
-  }
-
-  function secondsToTime(sec) {
-    const h = String(Math.floor(sec / 3600)).padStart(2, '0');
-    const m = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
-    const s = String(sec % 60).padStart(2, '0');
-    return `${h}:${m}:${s}`;
-  }
-
-  function updateProgress(ratio) {
-    const offset = CIRCUMFERENCE * (1 - ratio);
-    progressCircle.style.strokeDashoffset = offset;
-  }
-
-  function validateInput() {
-    const secs = timeToSeconds(input.value);
-    if (secs === null || secs <= 0) {
-      input.classList.add('invalid');
-      return false;
-    } else {
-      input.classList.remove('invalid');
-      return true;
+      setTimeout(() => requestAnimationFrame(drawMatrix), 40);
     }
-  }
 
-  function animateCountdown(timestamp) {
-    if (!startTime) startTime = timestamp;
-    const elapsed = (timestamp - startTime) / 1000;
-    const remaining = Math.max(0, totalSeconds - elapsed);
-    input.value = secondsToTime(Math.ceil(remaining));
-    updateProgress(remaining / totalSeconds);
+    initMatrix();
+    drawMatrix();
+    window.addEventListener("resize", initMatrix);
 
-    if (remaining > 0) {
-      rafId = requestAnimationFrame(animateCountdown);
-    } else {
-      running = false;
-      beep.play();
+    // Timer Logic
+    const input = document.getElementById('timeInput');
+    const progressCircle = document.querySelector('.circle-progress');
+    const beep = document.getElementById('beep');
+    const overlay = document.getElementById('overlay');
+    const RADIUS = 90;
+    const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+    let totalSeconds = 0, startTime = 0, running = false, rafId = null;
 
-      // Flash screen
-      overlay.style.opacity = '0.8';
-      setTimeout(() => overlay.style.opacity = '0', 400);
+    function timeToSeconds(timeStr) {
+      const parts = timeStr.split(':').map(p => parseInt(p, 10));
+      if (parts.length !== 3 || parts.some(p => isNaN(p))) return null;
+      const [h, m, s] = parts;
+      if (m >= 60 || s >= 60 || h < 0 || m < 0 || s < 0) return null;
+      return h * 3600 + m * 60 + s;
     }
-  }
 
-  function startTimer() {
-    if (running || !validateInput()) return;
-    totalSeconds = timeToSeconds(input.value);
-    startTime = null;
-    running = true;
-    rafId = requestAnimationFrame(animateCountdown);
-  }
+    function secondsToTime(sec) {
+      const h = String(Math.floor(sec / 3600)).padStart(2, '0');
+      const m = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
+      const s = String(sec % 60).padStart(2, '0');
+      return `${h}:${m}:${s}`;
+    }
 
-  function pauseTimer() {
-    if (rafId) cancelAnimationFrame(rafId);
-    running = false;
-  }
+    function updateProgress(ratio) {
+      const offset = CIRCUMFERENCE * (1 - ratio);
+      progressCircle.style.strokeDashoffset = offset;
+    }
 
-  function resetTimer() {
-    if (rafId) cancelAnimationFrame(rafId);
-    running = false;
-    input.value = secondsToTime(totalSeconds || 0);
-    updateProgress(1);
-  }
-
-  function setQuickTime(seconds) {
-    totalSeconds = seconds;
-    input.value = secondsToTime(seconds);
-    updateProgress(1);
-    startTimer();
-  }
-
-  document.getElementById('startBtn').addEventListener('click', startTimer);
-  document.getElementById('pauseBtn').addEventListener('click', pauseTimer);
-  document.getElementById('resetBtn').addEventListener('click', resetTimer);
-
-  input.addEventListener('input', () => {
-    validateInput();
-    if (!running) {
-      const val = timeToSeconds(input.value);
-      if (val !== null) {
-        totalSeconds = val;
-        updateProgress(1);
+    function validateInput() {
+      const secs = timeToSeconds(input.value);
+      if (secs === null || secs <= 0) {
+        input.classList.add('invalid');
+        return false;
+      } else {
+        input.classList.remove('invalid');
+        return true;
       }
     }
-  });
 
-  progressCircle.style.strokeDasharray = CIRCUMFERENCE;
-  progressCircle.style.strokeDashoffset = 0;
-</script>
+    function animateCountdown(timestamp) {
+      if (!startTime) startTime = timestamp;
+      const elapsed = (timestamp - startTime) / 1000;
+      const remaining = Math.max(0, totalSeconds - elapsed);
+      input.value = secondsToTime(Math.ceil(remaining));
+      updateProgress(remaining / totalSeconds);
+
+      if (remaining > 0) {
+        rafId = requestAnimationFrame(animateCountdown);
+      } else {
+        running = false;
+        beep.play();
+
+        // Flash screen
+        overlay.style.opacity = '0.8';
+        setTimeout(() => overlay.style.opacity = '0', 400);
+      }
+    }
+
+    function startTimer() {
+      if (running || !validateInput()) return;
+      totalSeconds = timeToSeconds(input.value);
+      startTime = null;
+      running = true;
+      rafId = requestAnimationFrame(animateCountdown);
+    }
+
+    function pauseTimer() {
+      if (rafId) cancelAnimationFrame(rafId);
+      running = false;
+    }
+
+    function resetTimer() {
+      if (rafId) cancelAnimationFrame(rafId);
+      running = false;
+      input.value = secondsToTime(totalSeconds || 0);
+      updateProgress(1);
+    }
+
+    function setQuickTime(seconds) {
+      totalSeconds = seconds;
+      input.value = secondsToTime(seconds);
+      updateProgress(1);
+      startTimer();
+    }
+
+    document.getElementById('startBtn').addEventListener('click', startTimer);
+    document.getElementById('pauseBtn').addEventListener('click', pauseTimer);
+    document.getElementById('resetBtn').addEventListener('click', resetTimer);
+
+    input.addEventListener('input', () => {
+      validateInput();
+      if (!running) {
+        const val = timeToSeconds(input.value);
+        if (val !== null) {
+          totalSeconds = val;
+          updateProgress(1);
+        }
+      }
+    });
+
+    progressCircle.style.strokeDasharray = CIRCUMFERENCE;
+    progressCircle.style.strokeDashoffset = 0;
+  </script>
 </body>
 </html>
+

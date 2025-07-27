@@ -2,17 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Smooth Stopwatch</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
-      overflow: hidden;
+      overflow-y: auto; /* allow vertical scroll on mobile */
       background: black;
       color: #ff69b4;
       font-family: 'Courier New', monospace;
       height: 100%;
+      -webkit-text-size-adjust: 100%;
     }
     canvas#matrix {
       position: fixed;
@@ -25,135 +26,172 @@
     .container {
       position: relative;
       text-align: center;
-      padding-top: 50px;
+      padding: 3vh 1vw 50px;
       z-index: 1;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 8vw;
+      margin-top: 0;
+      margin-bottom: 2vh;
     }
     #timeInput {
-      font-size: 80px;
+      font-size: 15vw;
       background: black;
       border: none;
       color: #ff69b4;
-      width: auto;
+      width: 90vw;
+      max-width: 400px;
       text-align: center;
       outline: none;
-      margin: 30px 0;
+      margin: 3vh 0 4vh;
+      border-radius: 6px;
+      user-select: none;
+    }
+    #controls {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1vw;
     }
     #controls button {
       background: black;
       color: #ff69b4;
       border: 2px solid #ff69b4;
-      font-size: 22px;
-      margin: 10px;
-      padding: 12px 24px;
+      font-size: 5vw;
+      padding: 1.2em 2em;
       cursor: pointer;
-      border-radius: 4px;
+      border-radius: 6px;
+      min-width: 100px;
+      box-sizing: border-box;
+      touch-action: manipulation;
+      user-select: none;
+      transition: background-color 0.3s ease;
     }
-    #controls button:hover {
+    #controls button:hover,
+    #controls button:focus {
       background-color: #330022;
+      outline: none;
+    }
+    /* Smaller screens adjustments */
+    @media (max-width: 400px) {
+      h1 {
+        font-size: 9vw;
+      }
+      #timeInput {
+        font-size: 18vw;
+        width: 95vw;
+      }
+      #controls button {
+        font-size: 6vw;
+        min-width: 80px;
+        padding: 1em 1.5em;
+      }
     }
   </style>
 </head>
 <body>
 
-<canvas id="matrix"></canvas>
+  <canvas id="matrix"></canvas>
 
-<div class="container">
-  <h1>⏱ Stopwatch ⏱</h1>
+  <div class="container">
+    <h1>⏱ Stopwatch ⏱</h1>
 
-  <input type="text" id="timeInput" value="00:00:00" readonly />
+    <input type="text" id="timeInput" value="00:00:00" readonly aria-label="Stopwatch time display" />
 
-  <div id="controls">
-    <button id="startBtn">Start</button>
-    <button id="pauseBtn">Pause</button>
-    <button id="resetBtn">Reset</button>
+    <div id="controls" role="group" aria-label="Stopwatch controls">
+      <button id="startBtn" type="button">Start</button>
+      <button id="pauseBtn" type="button">Pause</button>
+      <button id="resetBtn" type="button">Reset</button>
+    </div>
   </div>
-</div>
 
-<script>
-  // Matrix Background
-  const canvas = document.getElementById("matrix");
-  const ctx = canvas.getContext("2d");
-  const fontSize = 12;
-  const letters = 'アァイィウエオカキクケコサシスセソタチツテトナニヌネノ0123456789'.split('');
-  let columns, drops;
+  <script>
+    // Matrix Background
+    const canvas = document.getElementById("matrix");
+    const ctx = canvas.getContext("2d");
+    const fontSize = 12;
+    const letters = 'アァイィウエオカキクケコサシスセソタチツテトナニヌネノ0123456789'.split('');
+    let columns, drops;
 
-  function initMatrix() {
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = window.innerWidth * dpr;
-    canvas.height = window.innerHeight * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    columns = Math.floor(window.innerWidth / fontSize);
-    drops = Array(columns).fill(1);
-  }
-
-  function drawMatrix() {
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#00FF00';
-    ctx.font = fontSize + 'px monospace';
-
-    for (let i = 0; i < drops.length; i++) {
-      const text = letters[Math.floor(Math.random() * letters.length)];
-      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-      drops[i]++;
+    function initMatrix() {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      columns = Math.floor(window.innerWidth / fontSize);
+      drops = Array(columns).fill(1);
     }
 
-    setTimeout(() => requestAnimationFrame(drawMatrix), 40);
-  }
+    function drawMatrix() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#00FF00';
+      ctx.font = fontSize + 'px monospace';
 
-  initMatrix();
-  drawMatrix();
-  window.addEventListener("resize", initMatrix);
+      for (let i = 0; i < drops.length; i++) {
+        const text = letters[Math.floor(Math.random() * letters.length)];
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+      }
 
-  // Stopwatch Logic
-  const input = document.getElementById('timeInput');
-  let startTime = null, running = false, rafId = null, pausedTime = 0;
+      setTimeout(() => requestAnimationFrame(drawMatrix), 40);
+    }
 
-  function secondsToTime(sec) {
-    const h = String(Math.floor(sec / 3600)).padStart(2, '0');
-    const m = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
-    const s = String(sec % 60).padStart(2, '0');
-    return `${h}:${m}:${s}`;
-  }
+    initMatrix();
+    drawMatrix();
+    window.addEventListener("resize", initMatrix);
 
-  function animateStopwatch(timestamp) {
-    if (!startTime) startTime = timestamp;
-    const elapsed = (timestamp - startTime) / 1000 + pausedTime;
-    input.value = secondsToTime(Math.floor(elapsed));
-    rafId = requestAnimationFrame(animateStopwatch);
-  }
+    // Stopwatch Logic
+    const input = document.getElementById('timeInput');
+    let startTime = null, running = false, rafId = null, pausedTime = 0;
 
-  function startTimer() {
-    if (running) return;
-    running = true;
-    startTime = null;
-    rafId = requestAnimationFrame(animateStopwatch);
-  }
+    function secondsToTime(sec) {
+      const h = String(Math.floor(sec / 3600)).padStart(2, '0');
+      const m = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
+      const s = String(sec % 60).padStart(2, '0');
+      return `${h}:${m}:${s}`;
+    }
 
-  function pauseTimer() {
-    if (!running) return;
-    if (rafId) cancelAnimationFrame(rafId);
-    running = false;
-    const currentTime = parseTime(input.value);
-    pausedTime = currentTime;
-  }
+    function animateStopwatch(timestamp) {
+      if (!startTime) startTime = timestamp;
+      const elapsed = (timestamp - startTime) / 1000 + pausedTime;
+      input.value = secondsToTime(Math.floor(elapsed));
+      rafId = requestAnimationFrame(animateStopwatch);
+    }
 
-  function resetTimer() {
-    if (rafId) cancelAnimationFrame(rafId);
-    running = false;
-    pausedTime = 0;
-    input.value = "00:00:00";
-  }
+    function startTimer() {
+      if (running) return;
+      running = true;
+      startTime = null;
+      rafId = requestAnimationFrame(animateStopwatch);
+    }
 
-  function parseTime(timeStr) {
-    const parts = timeStr.split(':').map(p => parseInt(p, 10));
-    return parts[0] * 3600 + parts[1] * 60 + parts[2];
-  }
+    function pauseTimer() {
+      if (!running) return;
+      if (rafId) cancelAnimationFrame(rafId);
+      running = false;
+      const currentTime = parseTime(input.value);
+      pausedTime = currentTime;
+    }
 
-  document.getElementById('startBtn').addEventListener('click', startTimer);
-  document.getElementById('pauseBtn').addEventListener('click', pauseTimer);
-  document.getElementById('resetBtn').addEventListener('click', resetTimer);
-</script>
+    function resetTimer() {
+      if (rafId) cancelAnimationFrame(rafId);
+      running = false;
+      pausedTime = 0;
+      input.value = "00:00:00";
+    }
+
+    function parseTime(timeStr) {
+      const parts = timeStr.split(':').map(p => parseInt(p, 10));
+      return parts[0] * 3600 + parts[1] * 60 + parts[2];
+    }
+
+    document.getElementById('startBtn').addEventListener('click', startTimer);
+    document.getElementById('pauseBtn').addEventListener('click', pauseTimer);
+    document.getElementById('resetBtn').addEventListener('click', resetTimer);
+  </script>
 </body>
 </html>
