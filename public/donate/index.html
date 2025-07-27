@@ -5,7 +5,7 @@
   <title>Donate</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <!-- Correct Favicon Links -->
+  <!-- Favicon Links -->
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="shortcut icon" href="/favicon.ico">
   <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico">
@@ -20,7 +20,6 @@
       font-family: 'Courier New', monospace;
       color: hotpink;
       overflow-y: auto;
-      -webkit-text-size-adjust: 100%;
     }
 
     canvas#matrix {
@@ -39,8 +38,8 @@
       align-items: center;
       min-height: 100vh;
       text-align: center;
-      padding: 0 5vw;
-      max-width: 480px;
+      padding: 0 40px;
+      max-width: 600px;
       margin: 0 auto;
     }
 
@@ -51,31 +50,25 @@
     }
 
     .content h1 {
-      font-size: 10vw;
+      font-size: 36px;
       margin-bottom: 0.5em;
-      line-height: 1.1;
     }
 
     .content p {
-      font-size: 5vw;
+      font-size: 20px;
       margin-bottom: 1.5em;
-      max-width: 90vw;
     }
 
     .cashapp-tag {
-      font-size: 7vw;
+      font-size: 24px;
       font-weight: bold;
       background: #330033;
       border: 2px solid hotpink;
-      padding: 15px 40px;
+      padding: 12px 30px;
       border-radius: 10px;
       cursor: pointer;
       transition: background-color 0.3s;
       user-select: all;
-      max-width: 90vw;
-      white-space: nowrap;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
     }
 
     .cashapp-tag:hover,
@@ -89,19 +82,6 @@
       25% { transform: translateY(-6px); }
       50% { transform: translateY(0px); }
       75% { transform: translateY(6px); }
-    }
-
-    @media (max-width: 400px) {
-      .content h1 {
-        font-size: 12vw;
-      }
-      .content p {
-        font-size: 6vw;
-      }
-      .cashapp-tag {
-        font-size: 8vw;
-        padding: 12px 25px;
-      }
     }
   </style>
 </head>
