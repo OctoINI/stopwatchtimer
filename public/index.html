@@ -10,100 +10,130 @@
   <link rel="shortcut icon" href="/clocktime.ico" type="image/x-icon" />
 
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background: black;
-      color: white;
-      font-family: 'Courier New', monospace;
-      height: 100%;
-    }
-    canvas#matrix {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: 0;
-    }
-    #overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: white;
-      opacity: 0;
-      z-index: 5;
-      pointer-events: none;
-      transition: opacity 0.4s ease;
-    }
-    .container {
-      position: relative;
-      text-align: center;
-      padding-top: 50px;
-      z-index: 1;
-    }
-    #navLinks {
-      margin: 20px 0;
-    }
-    #navLinks a {
-      color: white;
-      text-decoration: none;
-      margin: 0 15px;
-      font-size: 18px;
-      border: 2px solid white;
-      padding: 6px 12px;
-      display: inline-block;
-      transition: background-color 0.3s ease;
-      border-radius: 4px;
-    }
-    #navLinks a:hover {
-      background-color: #222;
-    }
-    #timeInput {
-      font-size: 32px;
-      background: black;
-      border: 2px solid white;
-      color: white;
-      width: 180px;
-      text-align: center;
-      outline: none;
-    }
-    #timeInput.invalid {
-      border-color: red;
-    }
-    #controls button,
-    .quick-buttons button {
-      background: black;
-      color: white;
-      border: 2px solid white;
-      font-size: 18px;
-      margin: 10px;
-      padding: 10px 20px;
-      cursor: pointer;
-      border-radius: 4px;
-    }
-    #controls button:hover,
-    .quick-buttons button:hover {
-      background-color: #222;
-    }
-    .quick-buttons {
-      margin: 10px 0 20px;
-    }
-    svg {
-      transform: rotate(-90deg);
-      margin: 40px auto;
-      display: block;
-    }
-    .circle-bg {
-      stroke: #333;
-    }
-    .circle-progress {
-      stroke: white;
-      transition: stroke-dashoffset 0.1s linear;
-    }
-  </style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: black;
+    color: white;
+    font-family: 'Courier New', monospace;
+    height: 100%;
+  }
+
+  canvas#matrix {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+  }
+
+  #overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: white;
+    opacity: 0;
+    z-index: 5;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+
+  .container {
+    position: relative;
+    text-align: center;
+    padding-top: 50px;
+    z-index: 1;
+  }
+
+  #navLinks {
+    margin: 20px 0;
+  }
+
+  #navLinks a {
+    color: white;
+    text-decoration: none;
+    margin: 0 15px;
+    font-size: 18px;
+    border: 2px solid white;
+    padding: 6px 12px;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+    border-radius: 4px;
+  }
+
+  #navLinks a:hover {
+    background-color: #222;
+  }
+
+  #timeInput {
+    font-size: 32px;
+    background: black;
+    border: 2px solid white;
+    color: white;
+    width: 180px;
+    text-align: center;
+    outline: none;
+  }
+
+  #timeInput.invalid {
+    border-color: red;
+  }
+
+  #controls button,
+  .quick-buttons button {
+    background: black;
+    color: white;
+    border: 2px solid white;
+    font-size: 18px;
+    margin: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+
+  #controls button:hover,
+  .quick-buttons button:hover {
+    background-color: #222;
+  }
+
+  .quick-buttons {
+    margin: 10px 0 20px;
+  }
+
+  svg {
+    transform: rotate(-90deg);
+    margin: 40px auto;
+    display: block;
+  }
+
+  .circle-bg {
+    stroke: #333;
+  }
+
+  /* ✅ RGB Glow Animation */
+  @keyframes rgbStroke {
+    0%   { stroke: red; }
+    16%  { stroke: orange; }
+    33%  { stroke: yellow; }
+    50%  { stroke: lime; }
+    66%  { stroke: cyan; }
+    83%  { stroke: violet; }
+    100% { stroke: red; }
+  }
+
+  .circle-progress {
+    stroke-width: 10;
+    fill: none;
+    stroke-dasharray: 565.48;
+    stroke-dashoffset: 0;
+    animation: rgbStroke 5s linear infinite;
+    filter: drop-shadow(0 0 6px currentColor) drop-shadow(0 0 12px currentColor);
+    transition: stroke-dashoffset 0.1s linear;
+  }
+</style>
 </head>
 <body>
 
