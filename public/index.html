@@ -14,19 +14,20 @@
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background: black;
-    color: white;
-    font-family: 'Courier New', monospace;
     height: 100%;
+    font-family: 'Courier New', monospace;
+    color: white;
+
+    /* ✅ Animated Gradient Background */
+    background: linear-gradient(270deg, #0f0c29, #302b63, #24243e);
+    background-size: 600% 600%;
+    animation: gradientMove 16s ease infinite;
   }
 
-  canvas#matrix {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 0;
+  @keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
   }
 
   #overlay {
@@ -70,7 +71,7 @@
 
   #timeInput {
     font-size: 32px;
-    background: black;
+    background: transparent;
     border: 2px solid white;
     color: white;
     width: 180px;
@@ -84,7 +85,7 @@
 
   #controls button,
   .quick-buttons button {
-    background: black;
+    background: transparent;
     color: white;
     border: 2px solid white;
     font-size: 18px;
@@ -113,7 +114,6 @@
     stroke: #333;
   }
 
-  /* ✅ RGB Glow Animation */
   @keyframes rgbStroke {
     0%   { stroke: red; }
     16%  { stroke: orange; }
@@ -137,12 +137,11 @@
 </head>
 <body>
 
-<canvas id="matrix"></canvas>
 <div id="overlay"></div>
 
 <div class="container">
   <h1>⏱ Countdown Timer ⏱</h1>
-  
+
   <div id="navLinks">
     <a href="/stopwatch/">Stopwatch</a>
     <a href="/about/">About</a>
@@ -174,43 +173,6 @@
 <audio id="beep" src="alarm.mp3" preload="auto"></audio>
 
 <script>
-  // Matrix Background
-  const canvas = document.getElementById("matrix");
-  const ctx = canvas.getContext("2d");
-  const fontSize = 12;
-  const letters = 'アァイィウエオカキクケコサシスセソタチツテトナニヌネノ0123456789'.split('');
-  let columns, drops;
-
-  function initMatrix() {
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = window.innerWidth * dpr;
-    canvas.height = window.innerHeight * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    columns = Math.floor(window.innerWidth / fontSize);
-    drops = Array(columns).fill(1);
-  }
-
-  function drawMatrix() {
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#00FF00';
-    ctx.font = fontSize + 'px monospace';
-
-    for (let i = 0; i < drops.length; i++) {
-      const text = letters[Math.floor(Math.random() * letters.length)];
-      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-      drops[i]++;
-    }
-
-    setTimeout(() => requestAnimationFrame(drawMatrix), 40);
-  }
-
-  initMatrix();
-  drawMatrix();
-  window.addEventListener("resize", initMatrix);
-
-  // Timer Logic
   const input = document.getElementById('timeInput');
   const progressCircle = document.querySelector('.circle-progress');
   const beep = document.getElementById('beep');
