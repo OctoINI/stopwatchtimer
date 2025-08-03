@@ -4,8 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Smooth Countdown Timer</title>
-
-  <!-- ✅ Favicon -->
   <link rel="icon" type="image/x-icon" href="/clocktime.ico" />
   <link rel="shortcut icon" href="/clocktime.ico" type="image/x-icon" />
 
@@ -20,7 +18,18 @@
     background: black;
   }
 
-  /* ✅ Starfield Layers */
+  /* 🌌 Nebula Gradient Overlay */
+  .nebula {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(ellipse at center, rgba(75,0,130,0.2) 0%, rgba(0,0,0,0.7) 70%);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* ✨ Star Layers */
   .stars, .stars2, .stars3 {
     position: fixed;
     top: 0;
@@ -29,32 +38,34 @@
     height: 200%;
     background-repeat: repeat;
     z-index: 0;
-    animation: moveStars 200s linear infinite;
+    pointer-events: none;
+    animation: moveStars 300s linear infinite;
   }
 
   .stars {
     background-image: radial-gradient(white 1px, transparent 1px);
     background-size: 3px 3px;
-    opacity: 0.4;
+    opacity: 0.5;
+    animation-duration: 200s;
   }
 
   .stars2 {
     background-image: radial-gradient(white 1px, transparent 1px);
     background-size: 2px 2px;
+    opacity: 0.25;
     animation-duration: 300s;
-    opacity: 0.2;
   }
 
   .stars3 {
     background-image: radial-gradient(white 2px, transparent 1px);
-    background-size: 1.5px 1.5px;
+    background-size: 1px 1px;
+    opacity: 0.15;
     animation-duration: 400s;
-    opacity: 0.1;
   }
 
   @keyframes moveStars {
-    from { transform: translate(0, 0); }
-    to   { transform: translate(-50%, -50%); }
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(-50%, -50%); }
   }
 
   #overlay {
@@ -164,10 +175,11 @@
 </head>
 <body>
 
-<!-- ✅ Parallax Starfield Background -->
+<!-- 🌌 Background Effects -->
 <div class="stars"></div>
 <div class="stars2"></div>
 <div class="stars3"></div>
+<div class="nebula"></div>
 
 <div id="overlay"></div>
 
