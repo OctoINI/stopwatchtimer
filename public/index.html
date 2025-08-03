@@ -15,19 +15,46 @@
     padding: 0;
     overflow: hidden;
     height: 100%;
-    font-family: 'Courier New', monospace;
     color: white;
-
-    /* ✅ Animated Gradient Background */
-    background: linear-gradient(270deg, #0f0c29, #302b63, #24243e);
-    background-size: 600% 600%;
-    animation: gradientMove 16s ease infinite;
+    font-family: 'Courier New', monospace;
+    background: black;
   }
 
-  @keyframes gradientMove {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+  /* ✅ Starfield Layers */
+  .stars, .stars2, .stars3 {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 200%;
+    height: 200%;
+    background-repeat: repeat;
+    z-index: 0;
+    animation: moveStars 200s linear infinite;
+  }
+
+  .stars {
+    background-image: radial-gradient(white 1px, transparent 1px);
+    background-size: 3px 3px;
+    opacity: 0.4;
+  }
+
+  .stars2 {
+    background-image: radial-gradient(white 1px, transparent 1px);
+    background-size: 2px 2px;
+    animation-duration: 300s;
+    opacity: 0.2;
+  }
+
+  .stars3 {
+    background-image: radial-gradient(white 2px, transparent 1px);
+    background-size: 1.5px 1.5px;
+    animation-duration: 400s;
+    opacity: 0.1;
+  }
+
+  @keyframes moveStars {
+    from { transform: translate(0, 0); }
+    to   { transform: translate(-50%, -50%); }
   }
 
   #overlay {
@@ -46,7 +73,7 @@
     position: relative;
     text-align: center;
     padding-top: 50px;
-    z-index: 1;
+    z-index: 10;
   }
 
   #navLinks {
@@ -136,6 +163,11 @@
 </style>
 </head>
 <body>
+
+<!-- ✅ Parallax Starfield Background -->
+<div class="stars"></div>
+<div class="stars2"></div>
+<div class="stars3"></div>
 
 <div id="overlay"></div>
 
